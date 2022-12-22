@@ -38,7 +38,7 @@ fetch("http://localhost:3000/api/products/" + productId)
 // console.log(localStorage);
 let addToCart = document.getElementById("addToCart");
 
-addToCart.addEventListener("click", () => {
+addToCart.addEventListener("click", (e) => {
   let colorKanap = document.getElementById("colors").value;
   let quantityKanap = document.getElementById("quantity").value;
 
@@ -61,29 +61,29 @@ addToCart.addEventListener("click", () => {
     alert(
       "Veuillez sélectionner la couleur et la quantité (entre 1 et 100) du produit"
     );
-  }
-
-  // recupère le kanap dans le panier
-  const localcart = localStorage.getItem("cart");
-  let cart = [];
-
-  if (localcart != null) {
-    cart = JSON.parse(localcart);
-  }
-
-  // ajout au panier et ne pas dupliquer le kanap
-  let foundKanap = cart.find(
-    (c) => c.id == newProduct.id && c.color == newProduct.color
-  );
-  if (foundKanap != undefined) {
-    let totalqte = foundKanap.quantity + newProduct.quantity;
-    foundKanap.quantity = totalqte;
   } else {
-    cart.push(newProduct);
-  }
+    // recupère le kanap dans le panier
+    const localcart = localStorage.getItem("cart");
+    let cart = [];
+
+    if (localcart != null) {
+      cart = JSON.parse(localcart);
+    }
+
+    // ajout au panier et ne pas dupliquer le kanap
+    let foundKanap = cart.find(
+      (c) => c.id == newProduct.id && c.color == newProduct.color
+    );
+    if (foundKanap != undefined) {
+      let totalqte = foundKanap.quantity + newProduct.quantity;
+      foundKanap.quantity = totalqte;
+    } else {
+      cart.push(newProduct);
+    }
 
   // sauvegarde du produit dans le panier
   localStorage.setItem("cart", JSON.stringify(cart));
   // redirection vers le panier
-  location.replace("cart.html");
+  window.location.href = "./cart.html";
+  }
 });
