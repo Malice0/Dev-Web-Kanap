@@ -1,21 +1,29 @@
+// getcarts()
+const localcart = localStorage.getItem("cart");
+if (localcart === null) {
+  document.querySelector("#cartAndFormContainer > h1").textContent =
+    "Votre panier est vide";
+}
+
+console.log(localcart);
+
 let cartItems = document.getElementById("cart__items");
 let cartItem = document.createElement("article");
-cartItem.classList.add("cart__item");
 cartItems.appendChild(cartItem);
-// cartItem.setAttribute("data-id", `${i.id}`);
-// cartItem.setAttribute("data-color", `${i.}`);
-// faut récupérer les données selectionné
+cartItem.classList.add("cart__item");
 
-console.log(cartItem);
+cartItem.setAttribute("data-id", localcart.id); // source ?
+cartItem.setAttribute("data-color", localcart.color); // source ?
+// faut récupérer les données selectionné
 
 let divImg = document.createElement("div");
 cartItem.appendChild(divImg);
 divImg.classList.add("cart__item__img");
 
 let itemImg = document.createElement("img");
-// itemImg.setAttribute("src", p.imageUrl);
-// itemImg.setAttribute("alt", p.altTxt);
 divImg.appendChild(itemImg);
+itemImg.setAttribute("src", ""); // source ?
+itemImg.setAttribute("alt", ""); // source ?
 
 let divContent = document.createElement("div");
 cartItem.appendChild(divContent);
@@ -31,6 +39,9 @@ let itemPrice = document.createElement("p");
 divDescription.appendChild(itemTitle);
 divDescription.appendChild(itemColor);
 divDescription.appendChild(itemPrice);
+itemTitle.textContent = "Nom du produit"; // source ?
+itemColor.textContent = "Vert"; // source ?
+itemPrice.textContent = `42,00 €`; // source ?
 
 let divSettings = document.createElement("div");
 divContent.appendChild(divSettings);
@@ -42,9 +53,15 @@ divSettingsQuantity.classList.add("cart__item__content__settings__quantity");
 
 let qte = document.createElement("p");
 divSettingsQuantity.appendChild(qte);
+qte.textContent = "Qté : ";
 let qteInput = document.createElement("input");
 divSettingsQuantity.appendChild(qteInput);
-qteInput.classList.add("itemQuantity")
+qteInput.setAttribute("type", "number");
+qteInput.classList.add("itemQuantity");
+qteInput.setAttribute("name", "itemQuantity");
+qteInput.setAttribute("min", "1");
+qteInput.setAttribute("max", "100");
+qteInput.setAttribute("value", localcart.quantity); // source ?
 
 let divSettingsDelete = document.createElement("div");
 divSettings.appendChild(divSettingsDelete);
@@ -56,5 +73,4 @@ deleteItem.classList.add("deleteItem");
 deleteItem.textContent = "Supprimer";
 
 // -------------
-// Il me faut terminer d'attribuer les attribute pour l'article et l'input
-// Je dois compléter les champs avec les données product
+// Compléter les champs avec les données du product

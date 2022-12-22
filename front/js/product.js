@@ -38,9 +38,7 @@ fetch("http://localhost:3000/api/products/" + productId)
 // console.log(localStorage);
 let addToCart = document.getElementById("addToCart");
 
-addToCart.addEventListener("click", (e) => {
-  // e.preventDefault();
-
+addToCart.addEventListener("click", () => {
   let colorKanap = document.getElementById("colors").value;
   let quantityKanap = document.getElementById("quantity").value;
 
@@ -50,7 +48,7 @@ addToCart.addEventListener("click", (e) => {
     color: colorKanap,
   };
 
-  console.log(newProduct);
+  // console.log(newProduct);
   if (
     quantityKanap == undefined ||
     quantityKanap == null ||
@@ -65,8 +63,6 @@ addToCart.addEventListener("click", (e) => {
     );
   }
 
-  // sauvegarde du produit dans le panier
-
   // recupère le kanap dans le panier
   const localcart = localStorage.getItem("cart");
   let cart = [];
@@ -75,11 +71,7 @@ addToCart.addEventListener("click", (e) => {
     cart = JSON.parse(localcart);
   }
 
-  console.log(cart);
-
-  // cart.push(newProduct);
-
-  // ajout au panier
+  // ajout au panier et ne pas dupliquer le kanap
   let foundKanap = cart.find(
     (c) => c.id == newProduct.id && c.color == newProduct.color
   );
@@ -87,19 +79,11 @@ addToCart.addEventListener("click", (e) => {
     let totalqte = foundKanap.quantity + newProduct.quantity;
     foundKanap.quantity = totalqte;
   } else {
-  cart.push(newProduct);
+    cart.push(newProduct);
   }
+
+  // sauvegarde du produit dans le panier
   localStorage.setItem("cart", JSON.stringify(cart));
+  // redirection vers le panier
+  location.replace("cart.html");
 });
-
-// _id
-// .querySelector("#quantity")
-// .querySelector("#colors")
-// !use localStorage!
-// ++ dans le panier, il faut que la value = 0 += product
-// += dans le panier si _id + #colors on joute juste la quantité
-// Je pense direct à switch car if else il ya aura trop de condition
-
-//  !Attention multiplication inutile des products!
-//
-//

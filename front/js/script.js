@@ -6,7 +6,7 @@ fetch("http://localhost:3000/api/products")
   })
   .then((products) => {
     products.forEach((p) => {
-      console.log(p);
+      // console.log(p);
       let productLink = document.createElement("a");
       productLink.setAttribute("href", `product.html?id=${p._id}`);
       let items = document.getElementById("items");
