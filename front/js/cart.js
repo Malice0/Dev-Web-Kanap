@@ -16,6 +16,7 @@ localcart.forEach((l) => {
       totalPrice();
       changeQte();
       deleteKanap();
+      confirmation(l);
     });
 });
 function displayProduct(p, l) {
@@ -174,42 +175,172 @@ function deleteKanap() {
 
 // -------------
 // confirmation
+function confirmation(l) {
+  let form = document.getElementById("cart__order__form");
+  let contactSend = [];
 
-// récupération des donnéees du form
-let orderBtn = document.getElementById("order");
+  // récupération des donnéees du form
+  let orderBtn = document.getElementById("order");
 
-let firstName = document.getElementById("firstName");
-let lastName = document.getElementById("lastName");
-let address = document.getElementById("address");
-let city = document.getElementById("city");
-let eMail = document.getElementById("email");
+  let firstName = document.getElementById("firstName");
+  let lastName = document.getElementById("lastName");
+  let address = document.getElementById("address");
+  let city = document.getElementById("city");
+  let eMail = document.getElementById("email");
 
-// Formulaire Error querySelector
-let firstNameError = document.getElementById("firstNameErrorMsg");
-firstNameError.style.color = "red";
+  // Formulaire Error
+  let firstNameError = document.getElementById("firstNameErrorMsg");
+  firstNameError.style.color = "red";
 
-let lastNameError = document.getElementById("lastNameErrorMsg");
-lastNameError.style.color = "red";
+  let lastNameError = document.getElementById("lastNameErrorMsg");
+  lastNameError.style.color = "red";
 
-let addressError = document.getElementById("addressErrorMsg");
-addressError.style.color = "red";
+  let addressError = document.getElementById("addressErrorMsg");
+  addressError.style.color = "red";
 
-let cityError = document.getElementById("cityErrorMsg");
-cityError.style.color = "red";
+  let cityError = document.getElementById("cityErrorMsg");
+  cityError.style.color = "red";
 
-let eMailError = document.getElementById("emailErrorMsg");
-eMailError.style.color = "red";
+  let eMailError = document.getElementById("emailErrorMsg");
+  eMailError.style.color = "red";
 
-// regrouper les éléments pour ...
-let contact = {
-  firstName: firstName.value,
-  lastName: lastName.value,
-  address: address.value,
-  city: city.value,
-  eMail: eMail.value,
-};
-// console.log(contact);
+  const reName = /^[A-Z a-zà-ű]{3,20}[^\d]$/;
+  const reAdress = /[\wà-ű ']/gi;
+  const reMail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
-orderBtn.addEventListener("click", (e) => {
-  e.preventDefault;
-});
+  firstName.addEventListener("change", (e) => {
+    let name = e.target.value;
+    if (reName.test(name)) {
+      firstNameError.innerText = "";
+      return true;
+    } else {
+      firstNameError.innerText =
+        "champs incorrecte, veuillez renseigner votre prénom.";
+      return false;
+    }
+  });
+
+  lastName.addEventListener("change", (e) => {
+    let lastName = e.target.value;
+    if (reName.test(lastName)) {
+      lastNameError.innerText = "";
+      return true;
+    } else {
+      lastNameError.innerText =
+        "champs incorrecte, veuillez renseigner votre nom.";
+    }
+  });
+
+  address.addEventListener("change", (e) => {
+    let address = e.target.value;
+    if (reAdress.test(address)) {
+      addressError.innerText = "";
+      return true;
+    } else {
+      addressError.innerText =
+        "champs incorrecte, veuillez renseigner votre addresse.";
+    }
+  });
+
+  city.addEventListener("change", (e) => {
+    let city = e.target.value;
+    if (reAdress.test(city)) {
+      cityError.innerText = "";
+      return true;
+    } else {
+      cityError.innerText =
+        "champs incorrecte, veuillez renseigner votre ville.";
+    }
+  });
+
+  eMail.addEventListener("change", (e) => {
+    let eMail = e.target.value;
+    if (reMail.test(eMail)) {
+      eMailError.innerText = "";
+      return true;
+    } else {
+      eMailError.innerText =
+        "champs incorrecte, veuillez renseigner votre Email.";
+    }
+  });
+
+  orderBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    // regrouper les éléments pour ...
+    let contact = {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      address: address.value,
+      city: city.value,
+      eMail: eMail.value,
+    };
+    contactSend.push(l.id, contact);
+    console.log(contactSend);
+    // requête POST
+    // fetch("http://localhost:3000/api/products/order", {
+    //   method: "POST",
+    //   headers: {
+    //     accept: "application/json",
+    //     "content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     contactSend,
+    //   }),
+    // })
+    //   .then(function (response) {
+    //     if (response.ok) {
+    //       return response.json();
+    //     }
+    //   })
+    //   .then((result) => {
+    //     let resultSend = response.json();
+    //     let orderId = resultSend.orderId;
+    //     alert(result.message);
+    //   });
+  });
+}
+
+// function send() {
+//   let cart = JSON.parse(localStorage.getItem("produits"));
+//   // => si tout est ok, alors...
+//   if (cart !== null &&
+//     verifFirstName() &&
+//     verifLastName() &&
+//     verifAddress() &&
+//     verifCity() &&
+//     verifEmail()
+//   ) {
+//     console.log("fonction ok", cart);
+
+//     fetch("http://localhost:3000/api/products/order", {
+//       method: "POST",
+//       body: JSON.stringify({
+//         contact,
+//         products: products, //cart.id,
+//       }),
+//       headers: {
+//         Accept: "application/json",
+//         "Content-Type": "application/json",
+//       },
+//     })
+//       // Récupération et stockage de la réponse de l'API (orderId)
+
+//       .then((response) => {
+//         return response.json();
+//       })
+//       .then((server) => {
+//         const orderId = server.orderId;
+
+//         if (orderId != "") {
+//           // Si l'orderId a bien été récupéré, on redirige l'utilisateur vers la page de Confirmation
+//           location.href = "confirmation.html?orderid=" + orderId;
+//         }
+//       });
+//   } //else {
+//     //alert(
+//       //"Envoie impossible, veuillez bien commander des produits avant l'envoie."
+//     //);
+//     console.log("fonction non validée");
+//  // }
+// }
