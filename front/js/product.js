@@ -75,7 +75,7 @@ addToCart.addEventListener("click", (e) => {
       (c) => c.id == newProduct.id && c.color == newProduct.color
     );
     if (foundKanap != undefined) {
-      let totalqte = foundKanap.quantity + newProduct.quantity;
+      let totalqte = parseInt(foundKanap.quantity) + parseInt(newProduct.quantity);
       foundKanap.quantity = totalqte;
     } else {
       cart.push(newProduct);
