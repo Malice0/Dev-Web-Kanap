@@ -1,10 +1,10 @@
 const localcart = JSON.parse(localStorage.getItem("cart"));
-if (localcart === null || localcart == []) {
-  document.querySelector("h1").textContent = "Votre panier est vide";
-  document.getElementById("totalQuantity").innerText = "0";
-  document.getElementById("totalPrice").innerText = "0";
+if (localcart == [] || localcart === null) {
+  document.querySelector("#cartAndFormContainer > h1").textContent =
+    "Votre panier est vide";
+  document.querySelector("#totalQuantity").textc = "0";
+  document.querySelector("#totalPrice").innerText = "0";
 } else {
-  // Quand panier vide affiche if
   localcart.forEach((l) => {
     fetch("http://localhost:3000/api/products/" + l.id)
       .then(function (response) {
@@ -17,10 +17,10 @@ if (localcart === null || localcart == []) {
         totalQte();
         totalPrice();
         changeQte();
-        deleteKanap();
         confirmation(l);
       });
   });
+
   function displayProduct(p, l) {
     const cartItems = document.getElementById("cart__items");
 
@@ -79,7 +79,6 @@ if (localcart === null || localcart == []) {
     qteInput.setAttribute("min", "1");
     qteInput.setAttribute("max", "100");
     qteInput.setAttribute("value", l.quantity);
-    // console.log(l);
 
     let divSettingsDelete = document.createElement("div");
     divSettings.appendChild(divSettingsDelete);
@@ -89,95 +88,95 @@ if (localcart === null || localcart == []) {
     divSettingsDelete.appendChild(deleteItem);
     deleteItem.classList.add("deleteItem");
     deleteItem.textContent = "Supprimer";
-    totalQte();
+
+    const kanapId = deleteItem.closest(".cart__item").dataset.id;
+    const kanapColor = deleteItem.closest(".cart__item").dataset.color;
+
+    deleteItem.addEventListener("click", () => {
+      deleteKanap(kanapId, kanapColor);
+    });
   }
 
+  // Afficher la quantité total des produits
   function totalQte() {
     const totalKanap = document.getElementById("totalQuantity");
     const localcart = JSON.parse(localStorage.getItem("cart"));
+    // initialisation du tableau totaleQty
     let totalQte = [];
     let totaleQty = 0;
-
+    // pour chaque produit dans le localStorage
     localcart.forEach((q) => {
+      // ajoute la quantité et est égale à totaleQty
       totaleQty += parseInt(q.quantity);
     });
-
+    // ajout du nombre obtenu (totaleQty) à tatoleQte
     totalQte.push(totaleQty);
+    // le texte de tatolKanap est tatoleQty
     totalKanap.textContent = totaleQty;
   }
 
+  // Afficher le prix total des produits
   function totalPrice() {
-    // A revoir
+    // sélectionne les éléments nécessaire, le prix et la quantité de chaque produit, le prix total.
     const price = document.getElementById("totalPrice");
     let qte = document.querySelectorAll(".itemQuantity");
     let getPrice = document.querySelectorAll(
-      ".cart__item__content__description"
+      ".cart__item__content__description "
     );
+    // initialisation du prix total
     let totalPrice = 0;
-
     for (let i = 0; i < getPrice.length; i++) {
-      // récupération du prix sur la page( mis en number)
+      // récupération des prix sur la page( mis en nombre), pour multiplier par la quantité
       totalPrice +=
         parseInt(getPrice[i].lastElementChild.textContent) * qte[i].value;
     }
-
     price.textContent = totalPrice;
   }
-  // changement quantité
+
+  // Afficher le changement de la quantité des produits
   function changeQte() {
     const qteItem = document.querySelectorAll(".itemQuantity");
-    // console.log();
     qteItem.forEach((qteItem) => {
-      // console.log(qteItem);
       qteItem.addEventListener("change", () => {
+        // nouvelle constance pour donner sa valeur à l'input
         const newQte = qteItem.value;
-        console.log(newQte);
         qteItem.textContent = newQte;
+        // sélectionne l'article ou il y a le changement
         let article = qteItem.closest("article");
         const localcart = JSON.parse(localStorage.getItem("cart"));
+        // récupération de l'id et de la couleur de l'article
         let kanapId = article.getAttribute("data-id");
         let kanapColor = article.getAttribute("data-color");
-        for (let i = 0; i < localcart.length; i++) {
-          const productLs = localcart[i];
+        // pour chaque produit dans le localStorage
+        localcart.forEach((lCart) => {
+          const productLs = lCart;
+          // La quantité dans le localStorage prends la valeur de l'input
           if (kanapId === productLs.id && kanapColor === productLs.color) {
             productLs.quantity = newQte;
+            // enregistre les changement dans le localStorage
             localStorage.setItem("cart", JSON.stringify(localcart));
           }
-        }
-        // totalQte();
+        });
+        // rechargement de la page pour actualiser la quantité
         location.reload();
       });
     });
   }
-  // supprimer un article
-  function deleteKanap() {
-    let deleteItem = document.querySelectorAll(".cart__item .deleteItem");
-    deleteItem.forEach((d) => {
-      d.addEventListener("click", () => {
-        let article = d.closest("article");
-        const localcart = JSON.parse(localStorage.getItem("cart"));
-        let kanapId = article.getAttribute("data-id");
-        let kanapColor = article.getAttribute("data-color");
-        localcart.forEach((l) => {
-          const cart = localcart.filter(
-            (p) => p.id !== l.id && p.color !== l.color
-          );
-          localStorage.setItem("cart", JSON.stringify(cart));
-          article.remove();
-          if (localcart === null || localcart == []) {
-            document.querySelector("h1").textContent = "Votre panier est vide";
-            document.getElementById("totalQuantity").innerText = "0";
-            document.getElementById("totalPrice").innerText = "0";
-          } else {
-            document.querySelector("h1").textContent = "Votre panier est vide";
-            totalQte();
-            totalPrice();
-          }
-        });
-      });
-    });
+
+  // supprimer un article du panier
+  function deleteKanap(kanapId, kanapColor) {
+    const localcart = JSON.parse(localStorage.getItem("cart"));
+    const cartFilter = localcart.filter(
+      (p) =>
+        (p.id !== kanapId && p.color !== kanapColor) ||
+        (p.id === kanapId && p.color !== kanapColor)
+    );
+    let newCart = cartFilter;
+    localStorage.setItem("cart", JSON.stringify(newCart));
+    location.reload();
   }
-  // confirmation
+
+  // confirmation de la commande
   function confirmation(l) {
     let products = [];
     localcart.forEach((id) => {
@@ -194,7 +193,7 @@ if (localcart === null || localcart == []) {
     let city = document.getElementById("city");
     let eMail = document.getElementById("email");
 
-    // Formulaire Error
+    // Formulaire message d'erreur
     let firstNameError = document.getElementById("firstNameErrorMsg");
     firstNameError.style.color = "red";
 
@@ -210,10 +209,12 @@ if (localcart === null || localcart == []) {
     let eMailError = document.getElementById("emailErrorMsg");
     eMailError.style.color = "red";
 
+    // regex pour la validation des données entrées dans le formulaire
     const reName = /^[A-Z a-zà-ű]{3,20}[^\d]$/;
     const reAdress = /[\wà-ű ']/gi;
     const reMail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
+    // Si input non validé par le regex alors un message s'affiche
     firstName.addEventListener("change", (e) => {
       let name = e.target.value;
       if (reName.test(name)) {
@@ -221,7 +222,7 @@ if (localcart === null || localcart == []) {
         return true;
       } else {
         firstNameError.innerText =
-          "champs incorrecte, veuillez renseigner votre prénom.";
+          "champs incorrecte, veuillez renseigner votre prénom. Exemple : Roberto";
         return false;
       }
     });
@@ -233,7 +234,7 @@ if (localcart === null || localcart == []) {
         return true;
       } else {
         lastNameError.innerText =
-          "champs incorrecte, veuillez renseigner votre nom.";
+          "champs incorrecte, veuillez renseigner votre nom. Exemple : DUPONT";
       }
     });
 
@@ -244,7 +245,7 @@ if (localcart === null || localcart == []) {
         return true;
       } else {
         addressError.innerText =
-          "champs incorrecte, veuillez renseigner votre addresse.";
+          "champs incorrecte, veuillez renseigner votre addresse. Exemple : 20 avenue Marine LEPEN";
       }
     });
 
@@ -255,7 +256,7 @@ if (localcart === null || localcart == []) {
         return true;
       } else {
         cityError.innerText =
-          "champs incorrecte, veuillez renseigner votre ville.";
+          "champs incorrecte, veuillez renseigner votre ville. Exemple : Paris";
       }
     });
 
@@ -266,10 +267,11 @@ if (localcart === null || localcart == []) {
         return true;
       } else {
         eMailError.innerText =
-          "champs incorrecte, veuillez renseigner votre Email.";
+          "champs incorrecte, veuillez renseigner votre Email. Exemple : test@gmail.com";
       }
     });
 
+    // envoie des du tableau products et contact au back avec fetch POST
     orderBtn.addEventListener("click", (e) => {
       e.preventDefault();
 
@@ -298,8 +300,7 @@ if (localcart === null || localcart == []) {
         .then((id) => {
           try {
             const orderId = products;
-            // console.log(resultSend);
-
+            // nettoyer le localStorage et redirection vers la page confirmation avec id des products
             localStorage.clear();
             location.href = "confirmation.html?id=" + orderId;
           } catch (e) {
