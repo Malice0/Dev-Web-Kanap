@@ -1,10 +1,19 @@
+// Gestion du panier.
+// récupération des données du localStorage.
 const localcart = JSON.parse(localStorage.getItem("cart"));
-if (localcart == [] || localcart === null) {
+// Si le localStorage est vide afficher que le panier est vide.
+if (localcart == 0 || localcart === null) {
   document.querySelector("#cartAndFormContainer > h1").textContent =
     "Votre panier est vide";
-  document.querySelector("#totalQuantity").textc = "0";
+  document.querySelector("#totalQuantity").innerText = "0";
   document.querySelector("#totalPrice").innerText = "0";
 } else {
+  /** Pour chaque élément dans le localStorage
+   * Je requête l'API pour récupérer les données.
+   * récupération de la réponse au format json.
+   * récupération de la vrai réponse :
+   * excécute les functions suivantes.
+   */
   localcart.forEach((l) => {
     fetch("http://localhost:3000/api/products/" + l.id)
       .then(function (response) {
@@ -14,13 +23,17 @@ if (localcart == [] || localcart === null) {
       })
       .then((p) => {
         displayProduct(p, l);
-        totalQte();
         totalPrice();
-        changeQte();
-        confirmation(l);
       });
+    totalQte();
+    changeQte();
+    validForm();
+    confirmation();
   });
 
+  /** Création de article dans le panier avec image, nom, la couleur, le pirx, la quantité et l'option supprimer.
+   * exmple dans la page cart.html
+   */
   function displayProduct(p, l) {
     const cartItems = document.getElementById("cart__items");
 
@@ -89,81 +102,92 @@ if (localcart == [] || localcart === null) {
     deleteItem.classList.add("deleteItem");
     deleteItem.textContent = "Supprimer";
 
+    // récupération de l'id et de la couleur pour la fontion supprimer
     const kanapId = deleteItem.closest(".cart__item").dataset.id;
     const kanapColor = deleteItem.closest(".cart__item").dataset.color;
 
+    // évènement, au click sur l'option supprimer excécuter la fonction supprimer
     deleteItem.addEventListener("click", () => {
       deleteKanap(kanapId, kanapColor);
     });
   }
 
-  // Afficher la quantité total des produits
+  /** Afficher la quantité total des produits.
+   * Initialisation du tableau totaleQte,
+   * pour chaque produit dans le localStorage
+   * ajoute la quantité à totaleQty
+   * ajout du nombre obtenu (totaleQty) à tatoleQte
+   * le texte de tatolKanap est tatoleQty.
+   */
   function totalQte() {
     const totalKanap = document.getElementById("totalQuantity");
     const localcart = JSON.parse(localStorage.getItem("cart"));
-    // initialisation du tableau totaleQty
     let totalQte = [];
     let totaleQty = 0;
-    // pour chaque produit dans le localStorage
     localcart.forEach((q) => {
-      // ajoute la quantité et est égale à totaleQty
       totaleQty += parseInt(q.quantity);
     });
-    // ajout du nombre obtenu (totaleQty) à tatoleQte
     totalQte.push(totaleQty);
-    // le texte de tatolKanap est tatoleQty
     totalKanap.textContent = totaleQty;
   }
 
-  // Afficher le prix total des produits
+  /** Afficher le prix total des produits.
+   * Sélectionne les éléments nécessaire, le prix et la quantité de chaque produit, le prix total.
+   * initialisation du prix total
+   * récupération des prix sur la page( mis en nombre), pour multiplier par la quantité
+   * le texte de price est totalPrice.
+   */
   function totalPrice() {
-    // sélectionne les éléments nécessaire, le prix et la quantité de chaque produit, le prix total.
     const price = document.getElementById("totalPrice");
     let qte = document.querySelectorAll(".itemQuantity");
     let getPrice = document.querySelectorAll(
       ".cart__item__content__description "
     );
-    // initialisation du prix total
     let totalPrice = 0;
     for (let i = 0; i < getPrice.length; i++) {
-      // récupération des prix sur la page( mis en nombre), pour multiplier par la quantité
       totalPrice +=
         parseInt(getPrice[i].lastElementChild.textContent) * qte[i].value;
     }
     price.textContent = totalPrice;
   }
 
-  // Afficher le changement de la quantité des produits
+  /** Afficher le changement de la quantité des produits.
+   * Nouvelle constance pour donner sa valeur à l'input.
+   * Sélectionne l'article ou il y a le changement,
+   * récupération de l'id et de la couleur
+   * pour chaque produit dans le localStorage.
+   * La quantité dans le localStorage prends la valeur de l'input.
+   * Enregistre les changement dans le localStorage,
+   * rechargement de la page pour actualiser la quantité.
+   */
   function changeQte() {
     const qteItem = document.querySelectorAll(".itemQuantity");
     qteItem.forEach((qteItem) => {
       qteItem.addEventListener("change", () => {
-        // nouvelle constance pour donner sa valeur à l'input
         const newQte = qteItem.value;
         qteItem.textContent = newQte;
-        // sélectionne l'article ou il y a le changement
         let article = qteItem.closest("article");
         const localcart = JSON.parse(localStorage.getItem("cart"));
-        // récupération de l'id et de la couleur de l'article
         let kanapId = article.getAttribute("data-id");
         let kanapColor = article.getAttribute("data-color");
-        // pour chaque produit dans le localStorage
         localcart.forEach((lCart) => {
           const productLs = lCart;
-          // La quantité dans le localStorage prends la valeur de l'input
           if (kanapId === productLs.id && kanapColor === productLs.color) {
             productLs.quantity = newQte;
-            // enregistre les changement dans le localStorage
             localStorage.setItem("cart", JSON.stringify(localcart));
           }
         });
-        // rechargement de la page pour actualiser la quantité
         location.reload();
       });
     });
   }
 
-  // supprimer un article du panier
+  /** supprimer un article du panier.
+   * Constance pour filtrer la selection pour la suppression du produit,
+   * initialisation de newCart.
+   * Enregistrement de newCart dans le localStorage,
+   * rechagement de la page.
+   */
   function deleteKanap(kanapId, kanapColor) {
     const localcart = JSON.parse(localStorage.getItem("cart"));
     const cartFilter = localcart.filter(
@@ -176,45 +200,33 @@ if (localcart == [] || localcart === null) {
     location.reload();
   }
 
-  // confirmation de la commande
-  function confirmation(l) {
-    let products = [];
-    localcart.forEach((id) => {
-      // console.log(id);
-      products.push(id.id);
-    });
-    // console.log(products);
-    // récupération des donnéees du form
-    let orderBtn = document.getElementById("order");
-
+  /** Validation du formulaire avant l'envoie au back.
+   * récupération des éléments nécessaire pour vérifier et valider.
+   * regex pour la validation des données entrées dans le formulaire,
+   * Si input non validé par le regex alors un message s'affiche.
+   */
+  function validForm() {
     let firstName = document.getElementById("firstName");
     let lastName = document.getElementById("lastName");
     let address = document.getElementById("address");
     let city = document.getElementById("city");
     let eMail = document.getElementById("email");
 
-    // Formulaire message d'erreur
     let firstNameError = document.getElementById("firstNameErrorMsg");
     firstNameError.style.color = "red";
-
     let lastNameError = document.getElementById("lastNameErrorMsg");
     lastNameError.style.color = "red";
-
     let addressError = document.getElementById("addressErrorMsg");
     addressError.style.color = "red";
-
     let cityError = document.getElementById("cityErrorMsg");
     cityError.style.color = "red";
-
     let eMailError = document.getElementById("emailErrorMsg");
     eMailError.style.color = "red";
 
-    // regex pour la validation des données entrées dans le formulaire
     const reName = /^[A-Z a-zà-ű]{3,20}[^\d]$/;
     const reAdress = /[\wà-ű ']/gi;
     const reMail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
-    // Si input non validé par le regex alors un message s'affiche
     firstName.addEventListener("change", (e) => {
       let name = e.target.value;
       if (reName.test(name)) {
@@ -270,12 +282,26 @@ if (localcart == [] || localcart === null) {
           "champs incorrecte, veuillez renseigner votre Email. Exemple : test@gmail.com";
       }
     });
+  }
 
-    // envoie des du tableau products et contact au back avec fetch POST
+  /** Confirmation de la commande.
+   * Récupération de tout les id du panier dans un tableau products.
+   * Au click du bouton "Commander",
+   * création de "contact",
+   *  envoie du tableau products et contact au back avec fetch POST.
+   * Nettoyage du localStorage et redirection vers la page confirmation avec id des products.
+   */
+  function confirmation() {
+    let orderBtn = document.getElementById("order");
+    let eMail = document.getElementById("email");
+
+    let products = [];
+    localcart.forEach((prod) => {
+      products.push(prod.id);
+    });
     orderBtn.addEventListener("click", (e) => {
       e.preventDefault();
 
-      // regrouper les éléments pour ...
       let contact = {
         firstName: firstName.value,
         lastName: lastName.value,
@@ -283,8 +309,6 @@ if (localcart == [] || localcart === null) {
         city: city.value,
         eMail: eMail.value,
       };
-      products.push(l.id);
-      // requête POST
       fetch("http://localhost:3000/api/products/order", {
         method: "POST",
         headers: {
@@ -297,10 +321,10 @@ if (localcart == [] || localcart === null) {
         }),
       })
         .then((response) => response.json())
-        .then((id) => {
+        .then(() => {
           try {
             const orderId = products;
-            // nettoyer le localStorage et redirection vers la page confirmation avec id des products
+            // 
             localStorage.clear();
             location.href = "confirmation.html?id=" + orderId;
           } catch (e) {
