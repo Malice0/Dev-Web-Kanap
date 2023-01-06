@@ -37,10 +37,9 @@ fetch("http://localhost:3000/api/products")
   })
   // Si erreur afficher un message d'erreur
   .catch((error) => {
-    console.log("Le chargement des produits a rencontré un problème" + error);
-    let errorMessage = document.createElement("h2");
+    let errorMessage = items;
     errorMessage.textContent =
-      "Nous avons rencontrez des difficultés techniques et ne pouvons pas présenter les articles pour le moment. Nos équipes à l'oeuvre pour résoudre ce problème dans les plus brefs délais. Nous vous invitons à réessayer ultérieurement et nous nous excusons pour la gène occasionnée.";
-    errorMessage.style.padding = "15px";
-    productsList.appendChild(errorMessage);
+      "Nous avons rencontrez des difficultés techniques. Nous vous invitons à réessayer ultérieurement et nous nous excusons pour la gène occasionnée.";
+    errorMessage.style.fontSize = "30px";
+    errorMessage.style.textAlign = "center";
   });

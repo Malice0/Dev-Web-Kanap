@@ -37,6 +37,13 @@ fetch("http://localhost:3000/api/products/" + productId)
       productOption.setAttribute("value", c);
       productOption.textContent = c;
     });
+  })
+  .catch((error) => {
+    let errorMessage = document.querySelector("article");
+    errorMessage.textContent =
+      "Nous avons rencontrez des difficultés techniques. Nous vous invitons à réessayer ultérieurement et nous nous excusons pour la gène occasionnée.";
+    errorMessage.style.fontSize = "30px";
+    errorMessage.style.textAlign = "center";
   });
 
 // L'ajout au panier

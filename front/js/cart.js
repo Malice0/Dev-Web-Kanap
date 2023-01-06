@@ -23,12 +23,18 @@ if (localcart == 0 || localcart === null) {
       })
       .then((p) => {
         displayProduct(p, l);
+        totalQte();
         totalPrice();
+        changeQte();
+        validForm();
+      })
+      .catch((error) => {
+        let errorMessage = document.getElementById("cart__items");
+        errorMessage.textContent =
+          "Nous avons rencontrez des difficultés techniques. Nous vous invitons à réessayer ultérieurement et nous nous excusons pour la gène occasionnée.";
+        errorMessage.style.fontSize = "30px";
+        errorMessage.style.textAlign = "center";
       });
-    totalQte();
-    changeQte();
-    validForm();
-    confirmation();
   });
 
   /** Création de article dans le panier avec image, nom, la couleur, le pirx, la quantité et l'option supprimer.
@@ -203,9 +209,10 @@ if (localcart == 0 || localcart === null) {
   /** Validation du formulaire avant l'envoie au back.
    * récupération des éléments nécessaire pour vérifier et valider.
    * regex pour la validation des données entrées dans le formulaire,
-   * Si input non validé par le regex alors un message s'affiche.
+   * Si input non validé par le regex alors un message d'erreur s'affiche.
    */
   function validForm() {
+    let form = document.querySelector(".cart__order__form");
     let firstName = document.getElementById("firstName");
     let lastName = document.getElementById("lastName");
     let address = document.getElementById("address");
@@ -225,7 +232,7 @@ if (localcart == 0 || localcart === null) {
 
     const reName = /^[A-Z a-zà-ű]{3,20}[^\d]$/;
     const reAdress = /[\wà-ű ']/gi;
-    const reMail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+    const reMail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
     firstName.addEventListener("change", (e) => {
       let name = e.target.value;
@@ -247,6 +254,7 @@ if (localcart == 0 || localcart === null) {
       } else {
         lastNameError.innerText =
           "champs incorrecte, veuillez renseigner votre nom. Exemple : DUPONT";
+        return false;
       }
     });
 
@@ -258,6 +266,7 @@ if (localcart == 0 || localcart === null) {
       } else {
         addressError.innerText =
           "champs incorrecte, veuillez renseigner votre addresse. Exemple : 20 avenue Marine LEPEN";
+        return false;
       }
     });
 
@@ -269,17 +278,33 @@ if (localcart == 0 || localcart === null) {
       } else {
         cityError.innerText =
           "champs incorrecte, veuillez renseigner votre ville. Exemple : Paris";
+        return false;
       }
     });
-
     eMail.addEventListener("change", (e) => {
       let eMail = e.target.value;
+      // console.log(reMail.test(eMail));
+      // console.log(reMail.test(eMail));
       if (reMail.test(eMail)) {
         eMailError.innerText = "";
         return true;
       } else {
         eMailError.innerText =
           "champs incorrecte, veuillez renseigner votre Email. Exemple : test@gmail.com";
+        return false;
+      }
+    });
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (
+        reName.test(firstName.value) &&
+        reName.test(lastName.value) &&
+        reAdress.test(address.value) &&
+        reAdress.test(city.value) &&
+        reMail.test(eMail.value)
+      ) {
+        confirmation();
       }
     });
   }
@@ -288,7 +313,7 @@ if (localcart == 0 || localcart === null) {
    * Récupération de tout les id du panier dans un tableau products.
    * Au click du bouton "Commander",
    * création de "contact",
-   *  envoie du tableau products et contact au back avec fetch POST.
+   * envoie du tableau products et contact au back avec fetch POST.
    * Nettoyage du localStorage et redirection vers la page confirmation avec id des products.
    */
   function confirmation() {
@@ -324,7 +349,6 @@ if (localcart == 0 || localcart === null) {
         .then(() => {
           try {
             const orderId = products;
-            // 
             localStorage.clear();
             location.href = "confirmation.html?id=" + orderId;
           } catch (e) {
