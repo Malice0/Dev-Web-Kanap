@@ -324,37 +324,34 @@ if (localcart == 0 || localcart === null) {
     localcart.forEach((prod) => {
       products.push(prod.id);
     });
-    orderBtn.addEventListener("click", (e) => {
-      e.preventDefault();
 
-      let contact = {
-        firstName: firstName.value,
-        lastName: lastName.value,
-        address: address.value,
-        city: city.value,
-        eMail: eMail.value,
-      };
-      fetch("http://localhost:3000/api/products/order", {
-        method: "POST",
-        headers: {
-          accept: "application/json",
-          "content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          products: products,
-          contact: contact,
-        }),
-      })
-        .then((response) => response.json())
-        .then(() => {
-          try {
-            const orderId = products;
-            localStorage.clear();
-            location.href = "confirmation.html?id=" + orderId;
-          } catch (e) {
-            console.log(e);
-          }
-        });
-    });
+    let contact = {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      address: address.value,
+      city: city.value,
+      eMail: eMail.value,
+    };
+    fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        products: products,
+        contact: contact,
+      }),
+    })
+      .then((response) => response.json())
+      .then(() => {
+        try {
+          const orderId = products;
+          localStorage.clear();
+          location.href = "confirmation.html?id=" + orderId;
+        } catch (e) {
+          console.log(e);
+        }
+      });
   }
 }
