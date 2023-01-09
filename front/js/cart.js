@@ -111,10 +111,16 @@ if (localcart == 0 || localcart === null) {
     // récupération de l'id et de la couleur pour la fontion supprimer
     const kanapId = deleteItem.closest(".cart__item").dataset.id;
     const kanapColor = deleteItem.closest(".cart__item").dataset.color;
+    const deleteArticle = deleteItem.closest("article");
 
     // évènement, au click sur l'option supprimer excécuter la fonction supprimer
     deleteItem.addEventListener("click", () => {
-      deleteKanap(kanapId, kanapColor);
+      deleteKanap(kanapId, kanapColor, deleteArticle);
+      const localcart = JSON.parse(localStorage.getItem("cart"));
+      if (localcart == 0 || localcart === null) {
+        document.querySelector("#cartAndFormContainer > h1").textContent =
+          "Votre panier est vide";
+      }
     });
   }
 
@@ -183,7 +189,7 @@ if (localcart == 0 || localcart === null) {
             localStorage.setItem("cart", JSON.stringify(localcart));
           }
         });
-        location.reload();
+        totalQte();
       });
     });
   }
@@ -194,8 +200,9 @@ if (localcart == 0 || localcart === null) {
    * Enregistrement de newCart dans le localStorage,
    * rechagement de la page.
    */
-  function deleteKanap(kanapId, kanapColor) {
+  function deleteKanap(kanapId, kanapColor, deleteArticle) {
     const localcart = JSON.parse(localStorage.getItem("cart"));
+
     const cartFilter = localcart.filter(
       (p) =>
         (p.id !== kanapId && p.color !== kanapColor) ||
@@ -203,7 +210,9 @@ if (localcart == 0 || localcart === null) {
     );
     let newCart = cartFilter;
     localStorage.setItem("cart", JSON.stringify(newCart));
-    location.reload();
+    deleteArticle.remove();
+    totalPrice();
+    totalQte();
   }
 
   /** Validation du formulaire avant l'envoie au back.
