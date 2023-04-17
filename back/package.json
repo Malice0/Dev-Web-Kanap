@@ -1,12 +1,12 @@
 {
   "name": "kanap-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "site de vente de canapé",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Malice0",
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.4",
