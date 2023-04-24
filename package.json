@@ -1,5 +1,10 @@
 {
   "dependencies": {
-    "firebase": "^9.19.1"
+    "@supabase/supabase-js": "^2.20.0",
+    "firebase": "^9.19.1",
+    "json-2-csv": "^4.0.0"
+  },
+  "devDependencies": {
+    "supabase": "^1.50.8"
   }
 }
